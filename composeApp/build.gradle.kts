@@ -39,7 +39,7 @@ kotlin {
             }
         }
     }
-//
+
 //    iosArm64()
 //    iosSimulatorArm64()
 
@@ -57,7 +57,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-//            implementation(compose.components.resources)
+            implementation(compose.components.resources)
             api(libs.koin.core)
 //            implementation(libs.androidx.compose.components.resources)
 //            implementation(libs.androidx.compose.components.uiToolingPreview)
@@ -86,7 +86,7 @@ kotlin {
 
 compose.resources {
     publicResClass = true
-    packageOfResClass = "me.sample.library.resources"
+    packageOfResClass = ""
     generateResClass = always
 }
 
