@@ -8,10 +8,11 @@ import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
-    alias(libs.plugins.kotlinCocoapods)
-    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.jetbrains.compose)
+//    alias(libs.plugins.kotlin.cocoapods)
+    alias(libs.plugins.kotlin.multiplatform)
 }
 
 kotlin {
@@ -33,36 +34,39 @@ kotlin {
             sourceSetTree.set(KotlinSourceSetTree.test)
 
             dependencies {
-                implementation(libs.compose.ui.test.junit4.android)
-                debugImplementation(libs.compose.ui.test.manifest)
+                implementation(libs.androidx.compose.ui.test.junit4.android)
+                debugImplementation(libs.androidx.compose.ui.test.manifest)
             }
         }
     }
+//
+//    iosArm64()
+//    iosSimulatorArm64()
 
-    iosArm64()
-    iosSimulatorArm64()
-
-    cocoapods {
-        summary = "Some description for the Shared Module"
-        homepage = "Link to the Shared Module homepage"
-        version = "1.0"
-        ios.deploymentTarget = "16.0"
-        podfile = project.file("../iosApp/Podfile")
-
-        pod("DittoObjC") {
-            version = libs.versions.ditto.get()
-        }
-    }
+//    cocoapods {
+//        summary = "Some description for the Shared Module"
+//        homepage = "Link to the Shared Module homepage"
+//        version = "1.0"
+//        ios.deploymentTarget = "16.0"
+//        podfile = project.file("../iosApp/Podfile")
+//
+//        pod("DittoObjC") {
+//            version = libs.versions.ditto.get()
+//        }
+//    }
 
     sourceSets {
         commonMain.dependencies {
+//            implementation(compose.components.resources)
             api(libs.koin.core)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.runtime)
-            implementation(compose.ui)
+//            implementation(libs.androidx.compose.components.resources)
+//            implementation(libs.androidx.compose.components.uiToolingPreview)
+            implementation(libs.androidx.compose.foundation)
+            implementation(libs.androidx.compose.foundation.android)
+            implementation(libs.androidx.compose.material3)
+            implementation(libs.androidx.compose.ui)
+//            implementation(libs.androidx.compose.ui.tooling.preview.android)
+            implementation(libs.androidx.lifecycle.runtime.compose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -70,13 +74,20 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.accompanist.permissions)
             implementation(libs.androidx.activity.compose)
-            implementation(libs.androidx.lifecycle.runtime.compose)
-            implementation(libs.androidx.lifecycle.runtime.ktx)
-            implementation(libs.compose.ui.tooling.preview)
+//            implementation(libs.androidx.lifecycle.runtime.compose)
+//            implementation(libs.androidx.lifecycle.runtime.ktx)
+            implementation(libs.androidx.compose.runtime.android)
+            implementation(libs.androidx.compose.ui.tooling.preview)
             implementation(libs.ditto)
             implementation(libs.koin.android)
         }
     }
+}
+
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "me.sample.library.resources"
+    generateResClass = always
 }
 
 android {
@@ -112,7 +123,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     dependencies {
-        debugImplementation(libs.compose.ui.tooling)
+//        debugImplementation(libs.androidx.compose.ui.tooling)
 
         testImplementation(libs.kotlin.test)
         testImplementation(libs.testing.junit)
@@ -151,9 +162,9 @@ tasks {
         description = "Clean the Podfile.lock file"
         delete += listOf("$rootDir/iosApp/Podfile.lock")
     }
-    val podInstall by getting {
-        dependsOn(podClean)
-    }
+//    val podInstall by getting {
+//        dependsOn(podClean)
+//    }
 
     // compileDebugKotlinAndroid
     withType<KotlinCompile> {
