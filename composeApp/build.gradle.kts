@@ -3,6 +3,7 @@ import live.ditto.gradle.EnvGradleTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import java.io.FileInputStream
 import java.util.Properties
@@ -16,6 +17,9 @@ plugins {
 }
 
 kotlin {
+    compilerOptions {
+        apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0)
+    }
     metadata {
         compilations.configureEach {
             // Custom task which generates the Env object. Needs to be run before compileCommonMainKotlinMetadata
@@ -23,12 +27,6 @@ kotlin {
         }
     }
     androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        }
-
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         instrumentedTestVariant {
             sourceSetTree.set(KotlinSourceSetTree.test)
@@ -167,6 +165,15 @@ tasks {
 //    }
 
     // compileDebugKotlinAndroid
+
+    withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>()
+        .configureEach {
+            compilerOptions
+                .jvmTarget
+                .set(
+                    org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+                )
+        }
     withType<KotlinCompile> {
         // Ensure the [Env] object has been generated
         dependsOn(envTask)
