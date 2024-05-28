@@ -55,15 +55,12 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.components.resources)
             api(libs.koin.core)
-//            implementation(libs.androidx.compose.components.resources)
-//            implementation(libs.androidx.compose.components.uiToolingPreview)
-            implementation(libs.androidx.compose.foundation)
+            implementation(compose.components.resources)
+            implementation(compose.foundation)
+            implementation(compose.material3)
+            implementation(compose.ui)
             implementation(libs.androidx.compose.foundation.android)
-            implementation(libs.androidx.compose.material3)
-            implementation(libs.androidx.compose.ui)
-//            implementation(libs.androidx.compose.ui.tooling.preview.android)
             implementation(libs.androidx.lifecycle.runtime.compose)
         }
         commonTest.dependencies {
@@ -72,14 +69,18 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.accompanist.permissions)
             implementation(libs.androidx.activity.compose)
-//            implementation(libs.androidx.lifecycle.runtime.compose)
-//            implementation(libs.androidx.lifecycle.runtime.ktx)
             implementation(libs.androidx.compose.runtime.android)
             implementation(libs.androidx.compose.ui.tooling.preview)
             implementation(libs.ditto)
             implementation(libs.koin.android)
         }
     }
+}
+
+
+composeCompiler {
+    enableStrongSkippingMode = true
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
 }
 
 compose.resources {
@@ -121,8 +122,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     dependencies {
-//        debugImplementation(libs.androidx.compose.ui.tooling)
-
         testImplementation(libs.kotlin.test)
         testImplementation(libs.testing.junit)
         androidTestImplementation(libs.kotlin.test)
