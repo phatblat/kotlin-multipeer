@@ -1,40 +1,44 @@
 import com.android.build.gradle.tasks.factory.AndroidUnitTest
 import live.ditto.gradle.EnvGradleTask
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
 import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
-    alias(libs.plugins.androidApplication)
-    alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.kotlinCocoapods)
-    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.kotlin.cocoapods)
+    alias(libs.plugins.kotlin.multiplatform)
 }
 
 kotlin {
+    compilerOptions {
+        apiVersion.set(KOTLIN_2_0)
+    }
     metadata {
         compilations.configureEach {
             // Custom task which generates the Env object. Needs to be run before compileCommonMainKotlinMetadata
             compileTaskProvider.get().dependsOn("envTask")
         }
     }
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        }
 
+    androidTarget {
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         instrumentedTestVariant {
             sourceSetTree.set(KotlinSourceSetTree.test)
 
             dependencies {
-                implementation(libs.compose.ui.test.junit4.android)
-                debugImplementation(libs.compose.ui.test.manifest)
+                implementation(libs.androidx.compose.ui.test.junit4.android)
+                debugImplementation(libs.androidx.compose.ui.test.manifest)
             }
         }
     }
@@ -43,8 +47,12 @@ kotlin {
     iosSimulatorArm64()
 
     cocoapods {
-        summary = "Some description for the Shared Module"
-        homepage = "Link to the Shared Module homepage"
+        framework {
+            baseName = "commonMain"
+            isStatic = false
+        }
+        summary = "Sync apps with or without the internet"
+        homepage = "https://ditto.live/"
         version = "1.0"
         ios.deploymentTarget = "16.0"
         podfile = project.file("../iosApp/Podfile")
@@ -58,10 +66,8 @@ kotlin {
         commonMain.dependencies {
             api(libs.koin.core)
             implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
             implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.runtime)
+            implementation(compose.material3)
             implementation(compose.ui)
         }
         commonTest.dependencies {
@@ -70,13 +76,26 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.accompanist.permissions)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.compose.foundation.android)
+            implementation(libs.androidx.compose.runtime.android)
+            implementation(libs.androidx.compose.ui.tooling.preview)
             implementation(libs.androidx.lifecycle.runtime.compose)
-            implementation(libs.androidx.lifecycle.runtime.ktx)
-            implementation(libs.compose.ui.tooling.preview)
             implementation(libs.ditto)
             implementation(libs.koin.android)
         }
     }
+}
+
+
+composeCompiler {
+    enableStrongSkippingMode = true
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+}
+
+compose.resources {
+    publicResClass = true
+    packageOfResClass = ""
+    generateResClass = always
 }
 
 android {
@@ -112,8 +131,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     dependencies {
-        debugImplementation(libs.compose.ui.tooling)
-
         testImplementation(libs.kotlin.test)
         testImplementation(libs.testing.junit)
         androidTestImplementation(libs.kotlin.test)
@@ -151,11 +168,17 @@ tasks {
         description = "Clean the Podfile.lock file"
         delete += listOf("$rootDir/iosApp/Podfile.lock")
     }
-    val podInstall by getting {
-        dependsOn(podClean)
-    }
+//    val podInstall by getting {
+//        dependsOn(podClean)
+//    }
 
     // compileDebugKotlinAndroid
+    withType<KotlinJvmCompile>()
+        .configureEach {
+            compilerOptions
+                .jvmTarget
+                .set(JVM_11)
+        }
     withType<KotlinCompile> {
         // Ensure the [Env] object has been generated
         dependsOn(envTask)
