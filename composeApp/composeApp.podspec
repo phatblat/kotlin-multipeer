@@ -1,20 +1,20 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'composeApp'
     spec.version                  = '1.0'
-    spec.homepage                 = 'Link to the Shared Module homepage'
+    spec.homepage                 = 'https://ditto.live/'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''
     spec.license                  = ''
-    spec.summary                  = 'Some description for the Shared Module'
-    spec.vendored_frameworks      = 'build/cocoapods/framework/composeApp.framework'
+    spec.summary                  = 'Sync apps with or without the internet'
+    spec.vendored_frameworks      = 'build/cocoapods/framework/commonMain.framework'
     spec.libraries                = 'c++'
     spec.ios.deployment_target    = '16.0'
     spec.dependency 'DittoObjC', '4.7.1'
                 
-    if !Dir.exist?('build/cocoapods/framework/composeApp.framework') || Dir.empty?('build/cocoapods/framework/composeApp.framework')
+    if !Dir.exist?('build/cocoapods/framework/commonMain.framework') || Dir.empty?('build/cocoapods/framework/commonMain.framework')
         raise "
 
-        Kotlin framework 'composeApp' doesn't exist yet, so a proper Xcode project can't be generated.
+        Kotlin framework 'commonMain' doesn't exist yet, so a proper Xcode project can't be generated.
         'pod install' should be executed after running ':generateDummyFramework' Gradle task:
 
             ./gradlew :composeApp:generateDummyFramework
@@ -28,7 +28,7 @@ Pod::Spec.new do |spec|
                 
     spec.pod_target_xcconfig = {
         'KOTLIN_PROJECT_PATH' => ':composeApp',
-        'PRODUCT_MODULE_NAME' => 'composeApp',
+        'PRODUCT_MODULE_NAME' => 'commonMain',
     }
                 
     spec.script_phases = [

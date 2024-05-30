@@ -1,6 +1,8 @@
 import com.android.build.gradle.tasks.factory.AndroidUnitTest
 import live.ditto.gradle.EnvGradleTask
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
@@ -12,7 +14,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrains.compose)
-//    alias(libs.plugins.kotlin.cocoapods)
+    alias(libs.plugins.kotlin.cocoapods)
     alias(libs.plugins.kotlin.multiplatform)
 }
 
@@ -38,20 +40,24 @@ kotlin {
         }
     }
 
-//    iosArm64()
-//    iosSimulatorArm64()
+    iosArm64()
+    iosSimulatorArm64()
 
-//    cocoapods {
-//        summary = "Some description for the Shared Module"
-//        homepage = "Link to the Shared Module homepage"
-//        version = "1.0"
-//        ios.deploymentTarget = "16.0"
-//        podfile = project.file("../iosApp/Podfile")
-//
-//        pod("DittoObjC") {
-//            version = libs.versions.ditto.get()
-//        }
-//    }
+    cocoapods {
+        framework {
+            baseName = "commonMain"
+            isStatic = false
+        }
+        summary = "Sync apps with or without the internet"
+        homepage = "https://ditto.live/"
+        version = "1.0"
+        ios.deploymentTarget = "16.0"
+        podfile = project.file("../iosApp/Podfile")
+
+        pod("DittoObjC") {
+            version = libs.versions.ditto.get()
+        }
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -60,8 +66,6 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
-            implementation(libs.androidx.compose.foundation.android)
-            implementation(libs.androidx.lifecycle.runtime.compose)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -69,8 +73,10 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.accompanist.permissions)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.compose.foundation.android)
             implementation(libs.androidx.compose.runtime.android)
             implementation(libs.androidx.compose.ui.tooling.preview)
+            implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.ditto)
             implementation(libs.koin.android)
         }
