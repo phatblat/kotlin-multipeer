@@ -8,13 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import kotlinmultipeer.composeapp.generated.resources.Res
 import kotlinmultipeer.composeapp.generated.resources.compose_multiplatform
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-@Preview
 fun App() {
     MaterialTheme {
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
